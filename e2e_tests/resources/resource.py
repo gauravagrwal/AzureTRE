@@ -2,6 +2,7 @@ import asyncio
 import logging
 from httpx import AsyncClient, Timeout
 from starlette import status
+import time
 from e2e_tests.helpers import get_auth_header, get_full_endpoint
 from e2e_tests.resources.deployment import delete_done, install_done, patch_done
 
@@ -68,13 +69,17 @@ async def disable_and_delete_resource(endpoint, access_token, verify):
 async def wait_for(func, client, operation_endpoint, headers, failure_states: list):
     done, done_state, message = await func(client, operation_endpoint, headers)
     LOGGER.info(f'WAITING FOR OP: {operation_endpoint}')
+    start = time.time()
     while not done:
         await asyncio.sleep(30)
 
         done, done_state, message = await func(client, operation_endpoint, headers)
-        LOGGER.info(f"{done}, {done_state}, {message}")
+        LOGGER.info(f"Done: {done}, Current status: {done_state}, Message: {message}")
     try:
         assert done_state not in failure_states
     except Exception:
         LOGGER.exception(f"Failed to deploy status message: {message}")
         raise
+    finally:
+        end = time.time()
+        LOGGER.info(f"Operation {operation_endpoint} completed in {end-start} seconds")

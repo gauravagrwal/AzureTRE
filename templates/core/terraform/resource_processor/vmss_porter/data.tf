@@ -22,7 +22,7 @@ data "template_file" "cloudconfig" {
     resource_processor_vmss_porter_image_repository  = var.resource_processor_vmss_porter_image_repository
     resource_processor_vmss_porter_image_tag         = local.version
     app_insights_connection_string                   = var.app_insights_connection_string
-    resource_processor_number_processes_per_instance = var.resource_processor_number_processes_per_instance
+    resource_processor_number_processes_per_instance = 5
     key_vault_name                                   = var.key_vault_name
     rp_bundle_values                                 = local.rp_bundle_values_formatted
   }
